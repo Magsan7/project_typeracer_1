@@ -3,13 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- 1. PRIMARY META TAGS (Core SEO) -->
+    <title>TypeForge | Advanced Typing Speed Test & WPM Tracker</title>
+    <meta name="title" content="TypeForge | Advanced Typing Speed Test & WPM Tracker" />
+    <meta name="description" content="Improve your typing speed with TypeForge. A modern, minimalist typing test application featuring real-time WPM tracking, dynamic scrolling, and global leaderboards." />
+    <meta name="keywords" content="typing test, WPM, typing speed, monkeytype alternative, TypeForge, typing practice, touch typing, words per minute" />
+    <meta name="author" content="Magic World" />
+    
+    <!-- 2. CRAWLER INSTRUCTIONS -->
+    <!-- Tells Google bots to actively index this page and follow its links -->
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
 
-    <title>OA-Sim — Online Assessment Simulator</title>
+    <!-- 3. CANONICAL LINK -->
+    <!-- Prevents Google from getting confused if your site is accessed via http vs https -->
+    <link rel="canonical" href="https://project-typeracer-1-1.onrender.com" />
+    
+    <!-- 4. OPEN GRAPH (For beautiful previews on Facebook, LinkedIn, Discord) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://project-typeracer-1-1.onrender.com/" />
+    <meta property="og:title" content="TypeForge | Advanced Typing Speed Test" />
+    <meta property="og:description" content="Test and improve your typing speed with TypeForge. Compete on the global leaderboard!" />
+    <!-- Note: Create a 1200x630 image of your site, name it preview.png, put it in the public folder -->
+    <meta property="og:image" content="https://project-typeracer-1-1.onrender.com/preview.png" />
+
+    <!-- 5. TWITTER CARDS -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://project-typeracer-1-1.onrender.com/" />
+    <meta property="twitter:title" content="TypeForge | Advanced Typing Speed Test" />
+    <meta property="twitter:description" content="Test and improve your typing speed with TypeForge. Compete on the global leaderboard!" />
+    <meta property="twitter:image" content="https://project-typeracer-1-1.onrender.com/preview.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" /> 
+
+    <!-- 6. STRUCTURED DATA (JSON-LD) - The Secret SEO Weapon -->
+    <!-- This feeds Google's AI exactly what your app is, guaranteeing better search understanding -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TypeForge",
+      "url": "https://project-typeracer-1-1.onrender.com",
+      "description": "A minimalist, highly customizable typing speed test application with real-time WPM tracking and global leaderboards.",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All",
+      "author": {
+        "@type": "Organization",
+        "name": "Magic World"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
   </head>
-
   <body>
     <div id="root"></div>
-
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
