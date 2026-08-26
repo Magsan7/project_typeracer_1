@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeForge</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background & FX -->
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="confettiCanvas" style="display: none;"></canvas>
+    <div id="toast"></div>
+
+    <div class="app-container">
+        <!-- Header & Settings -->
+        <header>
+            <div class="logo">⌨️ TypeForge</div>
+            <div class="controls">
+                <button id="soundBtn" class="icon-btn" title="Toggle Sound">🔊</button>
+                <button id="settingsBtn" class="icon-btn" title="Settings">⚙️</button>
+                
+                <div id="settingsPanel" class="settings-panel">
+                    <h3>Settings</h3>
+                    <div class="setting-row">
+                        <label>Sound</label>
+                        <input type="checkbox" id="toggle-sound">
+                    </div>
+                    <div class="setting-row">
+                        <label>Virtual Keyboard</label>
+                        <input type="checkbox" id="toggle-keyboard" checked>
+                    </div>
+                    <div class="setting-row">
+                        <label>Smooth Caret</label>
+                        <input type="checkbox" id="toggle-caret" checked>
+                    </div>
+                    <div class="theme-picker">
+                        <div class="swatch" data-theme="rally" style="background: #F5A623;" title="Rally"></div>
+                        <div class="swatch" data-theme="terminal" style="background: #4ade80;" title="Terminal"></div>
+                        <div class="swatch" data-theme="aurora" style="background: #2dd4bf;" title="Aurora"></div>
+                        <div class="swatch" data-theme="ember" style="background: #f87171;" title="Ember"></div>
+                        <div class="swatch" data-theme="graphite" style="background: #9ca3af;" title="Graphite"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Mode Selection -->
+            <div class="mode-wrapper">
+                <div id="modeBar" class="mode-bar">
+                    <button class="mode-pill active" data-mode="time">Time</button>
+                    <button class="mode-pill" data-mode="words">Words</button>
+                    <button class="mode-pill" data-mode="quote">Quote</button>
+                </div>
+                <div class="options-row">
+                    <div id="subOptions" class="sub-options"></div>
+                    <div id="textOptions" class="text-options">
+                        <button class="chip" data-toggle="punctuation">@#</button>
+                        <button class="chip" data-toggle="numbers">123</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Race Track -->
+            <div id="raceTrack" class="race-track"></div>
+
+            <!-- Active Typing Area -->
+            <div id="typeCard" class="type-card">
+                <div class="live-stats">
+                    <div><span id="liveTime">30</span>s</div>
+                    <div><span id="liveWpm">0</span> wpm</div>
+                    <div><span id="liveAcc">100%</span> acc</div>
+                </div>
+                
+                <div id="wordsViewport" class="words-viewport">
+                    <div id="focusOverlay" class="focus-overlay show">
+                        <span>Click or press any key to focus</span>
+                    </div>
+                    <div id="caret" class="caret"></div>
+                    <div id="wordsContainer" class="words-container"></div>
+                </div>
+                
+                <input type="text" id="hiddenInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <button id="restartBtn" class="restart-btn" title="Restart Test (Tab)">↻ Restart</button>
+            </div>
+
+            <!-- Virtual Keyboard -->
+            <div id="keyboard" class="keyboard"></div>
+
+            <!-- Results Panel -->
+            <div id="resultsPanel" class="results-panel" hidden>
+                <div id="pbBadge" class="pb-badge" hidden>🎉 New Personal Best!</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-box primary">
+                        <div class="stat-label">WPM</div>
+                        <div id="resWpm" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-box primary">
+                        <div class="stat-label">ACCURACY</div>
+                        <div id="resAcc" class="stat-value">0%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">RAW</div>
+                        <div id="resRaw" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">CONSISTENCY</div>
+                        <div id="resCons" class="stat-value">0%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">CHARACTERS</div>
+                        <div id="resChars" class="stat-value">0/0/0/0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">TIME</div>
+                        <div id="resTime" class="stat-value">0s</div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <canvas id="wpmChart" class="wpm-chart"></canvas>
+                    <div id="keyboardHeat" class="keyboard heat-map"></div>
+                </div>
+
+                <div class="result-actions">
+                    <button id="nextTestBtn" class="action-btn next-btn">Next Test <span>(Tab)</span></button>
+                    <button id="shareBtn" class="action-btn outline-btn">Share Result</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- History & Stats -->
+        <footer>
+            <button id="historyToggle" class="history-toggle">View History ⏷</button>
+            <div id="historyBody" class="history-body" hidden>
+                <div class="history-content">
+                    <div class="history-sidebar">
+                        <h3>Personal Bests (Time)</h3>
+                        <div id="pbCards" class="pb-cards"></div>
+                    </div>
+                    <div class="history-main">
+                        <h3>Recent Performance</h3>
+                        <canvas id="sparkline" class="sparkline"></canvas>
+                        <div class="table-container">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Mode</th>
+                                        <th>WPM</th>
+                                        <th>Acc</th>
+                                        <th>Raw</th>
+                                        <th>Cons</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTbody"></tbody>
+                            </table>
+                        </div>
+                        <button id="clearHistoryBtn" class="action-btn outline-btn danger">Clear History</button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Load your JavaScript here -->
+    <script src="script.js"></script>
+</body>
+</html>

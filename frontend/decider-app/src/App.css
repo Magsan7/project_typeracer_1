@@ -1,0 +1,183 @@
+/* =========================================================
+   THEMES & VARIABLES (Monkeytype Style)
+   ========================================================= */
+:root {
+  --bg: #323437;
+  --panel-solid: #2c2e31;
+  --text: #d1d0c5;
+  --text-dim: #646669;
+  --border: #4a4d52;
+  --error: #ca4754;
+  --error-dim: #7e2a33;
+  --accent: #e2b714;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+[data-theme="rally"] {
+  --bg: #1a1a1b; --panel-solid: #222224; --text: #d1d5db; --text-dim: #5c626b; --border: #374151; --accent: #F5A623;
+}
+[data-theme="terminal"] {
+  --bg: #0d1117; --panel-solid: #161b22; --text: #c9d1d9; --text-dim: #484f58; --border: #30363d; --accent: #4ade80;
+}
+[data-theme="aurora"] {
+  --bg: #0f172a; --panel-solid: #1e293b; --text: #f8fafc; --text-dim: #475569; --border: #334155; --accent: #2dd4bf;
+}
+[data-theme="ember"] {
+  --bg: #1c1917; --panel-solid: #292524; --text: #fafaf9; --text-dim: #57534e; --border: #44403c; --accent: #f87171;
+}
+[data-theme="graphite"] {
+  --bg: #e5e5e5; --panel-solid: #f5f5f5; --text: #171717; --text-dim: #a3a3a3; --border: #d4d4d4; --accent: #52525b;
+}
+
+/* =========================================================
+   RESET & BACKGROUND
+   ========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  transition: background-color 0.4s ease, color 0.4s ease;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.app-container { width: 100%; max-width: 950px; padding: 2rem 1rem; display: flex; flex-direction: column; gap: 3rem; }
+
+/* =========================================================
+   HEADER & THEME PICKER
+   ========================================================= */
+header { display: flex; justify-content: space-between; align-items: center; }
+
+.logo { font-size: 1.8rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 0.8rem; }
+.logo svg { color: var(--accent); }
+
+.theme-picker { display: flex; gap: 0.5rem; background: var(--panel-solid); padding: 0.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.swatch { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; }
+.swatch:hover { transform: scale(1.2); }
+.swatch.active { border-color: var(--text); transform: scale(1.1); }
+
+/* =========================================================
+   MODE SELECTOR
+   ========================================================= */
+.mode-selector { display: flex; justify-content: center; gap: 2rem; background: var(--panel-solid); padding: 0.8rem 1.5rem; border-radius: 8px; border: 1px solid var(--border); width: fit-content; margin: 0 auto; transition: opacity 0.3s ease; }
+.mode-selector.hidden { opacity: 0; pointer-events: none; }
+
+.mode-tabs, .mode-options { display: flex; gap: 1rem; align-items: center; }
+.mode-selector button { background: transparent; border: none; color: var(--text-dim); font-family: inherit; font-size: 1rem; cursor: pointer; transition: color 0.2s; }
+.mode-selector button:hover { color: var(--text); }
+.mode-selector button.active { color: var(--accent); font-weight: bold; }
+
+/* =========================================================
+   TYPING AREA & OVERLAY
+   ========================================================= */
+.type-card { position: relative; display: flex; flex-direction: column; gap: 2rem; }
+
+.live-stats { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: 700; color: var(--accent); opacity: 0; transition: opacity 0.3s; }
+.live-stats.show { opacity: 1; }
+
+.words-viewport { 
+  position: relative; 
+  height: 135px; 
+  overflow-y: hidden; 
+  font-size: 1.8rem; 
+  line-height: 1.6; 
+  cursor: text; 
+  mask-image: linear-gradient(to bottom, black 65%, transparent 100%); 
+  -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%); 
+}
+
+.focus-overlay { position: absolute; inset: 0; z-index: 10; display: flex; justify-content: center; align-items: center; color: var(--text); font-size: 1.2rem; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(4px); }
+.focus-overlay.show { opacity: 1; pointer-events: all; cursor: pointer; }
+kbd { background: var(--panel-solid); border: 1px solid var(--border); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem; color: var(--accent); }
+
+.words-container { display: flex; flex-wrap: wrap; gap: 0 0.6em; align-content: flex-start; transition: filter 0.3s; }
+.words-container.blurred { filter: blur(5px); opacity: 0.5; }
+
+.word { 
+  display: inline-flex; 
+  margin-bottom: 0.3em; 
+  border-bottom: 2px solid transparent; 
+  position: relative; 
+}
+.word.error-word { border-bottom: 2px solid var(--error-dim); }
+
+.letter { transition: color 0.1s ease; position: relative; }
+.letter.pending { color: var(--text-dim); }
+.letter.correct { color: var(--text); text-shadow: 0 0 2px rgba(255,255,255,0.1); }
+.letter.incorrect { color: var(--error); }
+.letter.extra { color: var(--error-dim); font-weight: bold; }
+
+/* Caret Animation */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.caret::before, .caret-after::after, .caret-absolute { 
+  content: ""; 
+  position: absolute; 
+  width: 2px; 
+  height: 1.2em; 
+  top: 50%; 
+  transform: translateY(-50%); 
+  background-color: var(--accent); 
+  animation: blink 1s step-end infinite; 
+  border-radius: 2px; 
+  box-shadow: 0 0 6px var(--accent); 
+}
+
+.caret::before { left: -1px; } 
+.caret-after::after { right: -3px; } 
+.caret-absolute { left: -1px; }
+
+.hidden-input { position: absolute; opacity: 0; z-index: -1; }
+
+/* =========================================================
+   FOOTER CONTROLS
+   ========================================================= */
+.footer-actions { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+.restart-btn { background: transparent; border: none; color: var(--text-dim); font-size: 1.1rem; font-family: inherit; cursor: pointer; padding: 0.5rem 1rem; border-radius: 5px; transition: all 0.2s; }
+.restart-btn:hover { background: var(--panel-solid); color: var(--text); }
+.shortcut-hint { font-size: 0.8rem; color: var(--text-dim); }
+
+/* =========================================================
+   RESULTS & LEADERBOARD
+   ========================================================= */
+.results-panel { display: none; flex-direction: column; gap: 2.5rem; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.results-panel.show { display: flex; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.stat-box { background: var(--panel-solid); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; }
+.stat-box.primary { padding: 2.5rem; text-align: center; }
+.stat-box.primary .stat-value { font-size: 5rem; color: var(--accent); font-weight: 700; line-height: 1; margin-top: 0.5rem; text-shadow: 0 0 15px rgba(245, 166, 35, 0.2); }
+.stat-label { font-size: 1rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.stat-value-small { font-size: 2rem; font-weight: 700; color: var(--text); margin-top: 0.5rem; }
+.chars { color: var(--accent); font-size: 1.5rem; }
+
+.save-section { display: flex; justify-content: center; gap: 1rem; }
+.username-input { background: var(--panel-solid); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 1rem; padding: 0.8rem 1.2rem; border-radius: 8px; outline: none; width: 280px; transition: border-color 0.2s; }
+.username-input:focus { border-color: var(--accent); }
+
+.action-btn { padding: 0.8rem 2rem; border-radius: 8px; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; }
+.next-btn { background: var(--text); color: var(--bg); }
+.next-btn:hover:not(:disabled) { background: var(--accent); box-shadow: 0 0 15px var(--accent); }
+.next-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.outline-btn { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+.outline-btn:hover { color: var(--text); border-color: var(--text); }
+
+/* Leaderboard Table */
+.history-body { background: var(--panel-solid); border-radius: 12px; padding: 2rem; border: 1px solid var(--border); }
+.history-body h3 { color: var(--text); font-size: 1.2rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.history-table { width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; font-size: 1rem; text-align: left; }
+.history-table th { color: var(--text-dim); padding: 0 1rem 0.5rem 1rem; font-weight: 400; text-transform: uppercase; font-size: 0.85rem; }
+.history-table td { padding: 1rem; background: rgba(0,0,0,0.1); }
+.history-table tr td:first-child { border-radius: 8px 0 0 8px; }
+.history-table tr td:last-child { border-radius: 0 8px 8px 0; }
+
+.rank-badge { background: var(--border); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.85rem; color: var(--text); }
+.text-accent { color: var(--accent); font-weight: 700; font-size: 1.2rem; }
+.fw-bold { font-weight: 700; }
+.empty-state { text-align: center; color: var(--text-dim); font-style: italic; }
