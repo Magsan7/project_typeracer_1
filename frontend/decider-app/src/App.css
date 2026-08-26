@@ -34,6 +34,11 @@
    ========================================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* =========================================================
+   RESET & BACKGROUND (SYNTHWAVE QUANTUM MATRIX)
+   ========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -42,20 +47,67 @@ body {
   display: flex;
   justify-content: center;
   transition: background-color 0.4s ease, color 0.4s ease;
-  
-  /* THE DYNAMIC AURORA GRID */
-  background-image: 
-    /* Top-left soft glow */
-    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 40%),
-    /* Bottom-right soft glow */
-    radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 40%),
-    /* Modern structural grid */
-    linear-gradient(to right, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px);
-  
-  /* Lock the background in place so scrolling is buttery smooth */
-  background-size: 100% 100%, 100% 100%, 45px 45px, 45px 45px;
-  background-attachment: fixed;
+  position: relative;
+  overflow-x: hidden;
+  z-index: 0;
+}
+
+/* 1. THE 3D SCROLLING LASER FLOOR */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: -50vw; width: 200vw; height: 150vh;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--accent) 25%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--accent) 25%, transparent) 1px, transparent 1px);
+  background-size: 50px 50px;
+  /* This tilts the grid backwards into 3D space! */
+  transform: perspective(1000px) rotateX(60deg);
+  animation: matrixScroll 3s linear infinite;
+  z-index: -2;
+  pointer-events: none;
+  /* Fades the grid into the darkness at the horizon */
+  mask-image: linear-gradient(to bottom, transparent 5%, black 90%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 5%, black 90%);
+}
+
+/* 2. THE FLOATING LIQUID PLASMA */
+body::after {
+  content: "";
+  position: fixed;
+  top: -50%; left: -50%; width: 200vw; height: 200vh;
+  background:
+    radial-gradient(circle at 30% 70%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 40%),
+    radial-gradient(circle at 70% 30%, color-mix(in srgb, var(--text-dim) 15%, transparent) 0%, transparent 40%);
+  filter: blur(80px);
+  animation: plasmaBreathe 15s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 3. ENSURE APP SITS ON TOP OF THE 3D EFFECTS */
+.app-container { 
+  width: 100%; 
+  max-width: 950px; 
+  padding: 2rem 1rem; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 3rem; 
+  position: relative; 
+  z-index: 1; 
+}
+
+/* 4. KEYFRAMES FOR THE ANIMATION MAGIC */
+@keyframes matrixScroll {
+  0% { transform: perspective(1000px) rotateX(60deg) translateY(0); }
+  /* Moving it exactly 50px creates a flawless, invisible loop! */
+  100% { transform: perspective(1000px) rotateX(60deg) translateY(50px); } 
+}
+
+@keyframes plasmaBreathe {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.4) rotate(10deg) translateX(5%); }
+  100% { transform: scale(1) rotate(-10deg) translateX(-5%); }
 }
 
 .app-container { width: 100%; max-width: 950px; padding: 2rem 1rem; display: flex; flex-direction: column; gap: 3rem; }
@@ -144,8 +196,14 @@ kbd { background: var(--panel-solid); border: 1px solid var(--border); padding: 
 .caret-after::after { right: -3px; } 
 .caret-absolute { left: -1px; }
 
-.hidden-input { position: absolute; opacity: 0; z-index: -1; }
-
+.hidden-input { 
+  position: fixed; /* Changed from absolute to fixed */
+  top: 0; 
+  left: 0;
+  opacity: 0; 
+  z-index: -1; 
+  pointer-events: none; /* Stops it from blocking clicks */
+}
 /* =========================================================
    FOOTER CONTROLS
    ========================================================= */

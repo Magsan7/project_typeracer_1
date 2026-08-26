@@ -16,7 +16,7 @@ const THEMES = [
 ];
 
 export default function App() {
-  const [theme, setTheme] = useState('rally');
+  const [theme, setTheme] = useState('terminal');
   const [mode, setMode] = useState('time'); 
   const [timeSetting, setTimeSetting] = useState(30);
   const [wordSetting, setWordSetting] = useState(25);
@@ -79,28 +79,56 @@ export default function App() {
   const totalCharsTypedSoFar = typedHistory.join('').length + currentInput.length;
   const liveWpm = timeElapsed > 0 ? Math.round((totalCharsTypedSoFar / 5) / (timeElapsed / 60)) : 0;
 
+  // ==========================================
+  // UPDATED STRICT WPM MATH LOGIC
+  // ==========================================
   const endTest = useCallback(() => {
     setStatus('finished');
-    let correct = 0, incorrect = 0, extra = 0, missed = 0, totalCharsTyped = 0;
+    
+    let correctChars = 0;
+    let incorrectChars = 0;
+    let extraChars = 0;
+    let missedChars = 0;
+
     for (let i = 0; i <= activeWordIndex; i++) {
       if (i === words.length) break;
-      const target = words[i];
-      const typed = i === activeWordIndex ? currentInput : (typedHistory[i] || '');
-      for (let j = 0; j < Math.max(target.length, typed.length); j++) {
-        if (j < target.length && j < typed.length) {
-          totalCharsTyped++;
-          if (target[j] === typed[j]) correct++; else incorrect++;
-        } else if (j >= target.length) { extra++; totalCharsTyped++; } 
-        else missed++;
+
+      const actualWord = words[i];
+      const typedWord = i === activeWordIndex ? currentInput : (typedHistory[i] || '');
+
+      // Skip the active word if they haven't typed a single letter of it yet
+      if (i === activeWordIndex && typedWord.length === 0) continue;
+
+      for (let j = 0; j < Math.max(typedWord.length, actualWord.length); j++) {
+        if (j >= actualWord.length) {
+          extraChars++;
+        } else if (j >= typedWord.length) {
+          // This catches the spacebar skip exploit!
+          missedChars++;
+        } else if (typedWord[j] === actualWord[j]) {
+          correctChars++;
+        } else {
+          incorrectChars++;
+        }
       }
-      if (i < activeWordIndex) { correct++; totalCharsTyped++; } 
+
+      // Spacebar reward: Only given if the word is completely correct
+      if (i < activeWordIndex && typedWord === actualWord) {
+        correctChars++; 
+      }
     }
+
     const finalTime = mode === 'time' ? timeSetting : timeElapsed;
     const minutes = Math.max(finalTime, 1) / 60;
-    setRawStats({ correct, incorrect, extra, missed });
-    setWpm(Math.max(0, Math.round((correct / 5) / minutes)));
-    setAccuracy(totalCharsTyped > 0 ? Math.round((correct / totalCharsTyped) * 100) : 100);
+
+    setRawStats({ correct: correctChars, incorrect: incorrectChars, extra: extraChars, missed: missedChars });
+    setWpm(Math.max(0, Math.round((correctChars / 5) / minutes)));
+
+    const totalAttempted = correctChars + incorrectChars + extraChars + missedChars;
+    setAccuracy(totalAttempted > 0 ? Math.round((correctChars / totalAttempted) * 100) : 100);
+
   }, [activeWordIndex, words, currentInput, typedHistory, mode, timeSetting, timeElapsed]);
+  // ==========================================
 
   useEffect(() => { if (mode === 'time' && status === 'running' && timeLeft <= 0) endTest(); }, [timeLeft, status, mode, endTest]);
   useEffect(() => { if (mode === 'words' && status === 'running' && activeWordIndex >= wordSetting) endTest(); }, [activeWordIndex, wordSetting, status, mode, endTest]);
@@ -110,24 +138,20 @@ export default function App() {
       const parent = containerRef.current;
       const child = activeWordRef.current;
       
-      // Dynamically calculate the actual height of the word 
-      // This prevents bugs if you zoom in or change the font size!
-      const wordHeight = child.offsetHeight; 
+      const lineHeight = child.offsetHeight; 
       
-      // If the word gets pushed down to the 3rd line or beyond, scroll it up!
-      if (child.offsetTop > wordHeight * 1.5) {
-        parent.scrollTop = child.offsetTop - wordHeight; 
+      if (child.offsetTop > lineHeight * 1.5) {
+        parent.scrollTop = child.offsetTop - lineHeight; 
       } else {
         parent.scrollTop = 0;
       }
     }
-  }, [activeWordIndex, currentInput]); // ADDED currentInput so it checks on every keystroke!
+  }, [activeWordIndex, currentInput]);
 
-const handleKeyDown = (e) => {
+  const handleKeyDown = (e) => {
     if (status === 'finished') return;
     if (e.key === 'Tab') { e.preventDefault(); generateTest(); return; }
     
-    // Desktop timer fallback
     if (status === 'idle' && e.key.length === 1 && !e.ctrlKey && !e.metaKey) setStatus('running');
 
     if (e.key === ' ') {
@@ -141,8 +165,6 @@ const handleKeyDown = (e) => {
       setCurrentInput('');
     } 
     else if (e.key === 'Backspace') {
-      // ONLY intercept if the input is empty and we need to jump to the previous word.
-      // If there are letters in the current word, we let handleChange do the deleting naturally!
       if (currentInput.length === 0 && activeWordIndex > 0) {
         const prevIndex = activeWordIndex - 1;
         setActiveWordIndex(prevIndex);
@@ -154,11 +176,9 @@ const handleKeyDown = (e) => {
     }
   };
 
-const handleChange = (e) => {
+  const handleChange = (e) => {
     if (status === 'finished') return;
     
-    // NEW FIX: If the game is idle and the user types ANYTHING, start the timer!
-    // This bypasses the mobile keyboard bug completely.
     if (status === 'idle' && e.target.value.length > 0) {
       setStatus('running');
     }
