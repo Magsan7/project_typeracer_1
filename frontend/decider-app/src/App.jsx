@@ -109,27 +109,41 @@ export default function App() {
     if (activeWordRef.current && containerRef.current) {
       const parent = containerRef.current;
       const child = activeWordRef.current;
-      const lineHeight = 46; 
-      if (child.offsetTop > parent.scrollTop + lineHeight * 1.5) parent.scrollTop = child.offsetTop - lineHeight; 
-      else if (child.offsetTop < parent.scrollTop) parent.scrollTop = child.offsetTop;
+      
+      // Dynamically calculate the actual height of the word 
+      // This prevents bugs if you zoom in or change the font size!
+      const wordHeight = child.offsetHeight; 
+      
+      // If the word gets pushed down to the 3rd line or beyond, scroll it up!
+      if (child.offsetTop > wordHeight * 1.5) {
+        parent.scrollTop = child.offsetTop - wordHeight; 
+      } else {
+        parent.scrollTop = 0;
+      }
     }
-  }, [activeWordIndex]);
+  }, [activeWordIndex, currentInput]); // ADDED currentInput so it checks on every keystroke!
 
-  const handleKeyDown = (e) => {
+const handleKeyDown = (e) => {
     if (status === 'finished') return;
     if (e.key === 'Tab') { e.preventDefault(); generateTest(); return; }
+    
+    // Desktop timer fallback
     if (status === 'idle' && e.key.length === 1 && !e.ctrlKey && !e.metaKey) setStatus('running');
+
     if (e.key === ' ') {
       e.preventDefault();
       if (currentInput.length === 0 && typedHistory.length === activeWordIndex) return; 
+      
       const newHistory = [...typedHistory];
       newHistory[activeWordIndex] = currentInput;
       setTypedHistory(newHistory);
       setActiveWordIndex(prev => prev + 1);
       setCurrentInput('');
-    } else if (e.key === 'Backspace') {
-      if (currentInput.length > 0) setCurrentInput(prev => prev.slice(0, -1));
-      else if (activeWordIndex > 0) {
+    } 
+    else if (e.key === 'Backspace') {
+      // ONLY intercept if the input is empty and we need to jump to the previous word.
+      // If there are letters in the current word, we let handleChange do the deleting naturally!
+      if (currentInput.length === 0 && activeWordIndex > 0) {
         const prevIndex = activeWordIndex - 1;
         setActiveWordIndex(prevIndex);
         setCurrentInput(typedHistory[prevIndex] || '');

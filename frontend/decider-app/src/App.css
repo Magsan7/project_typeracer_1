@@ -9,7 +9,7 @@
   --border: #4a4d52;
   --error: #ca4754;
   --error-dim: #7e2a33;
-  --accent: #e2b714;
+  --accent: #4ade80;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
@@ -42,8 +42,20 @@ body {
   display: flex;
   justify-content: center;
   transition: background-color 0.4s ease, color 0.4s ease;
-  background-image: radial-gradient(var(--border) 1px, transparent 1px);
-  background-size: 30px 30px;
+  
+  /* THE DYNAMIC AURORA GRID */
+  background-image: 
+    /* Top-left soft glow */
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 40%),
+    /* Bottom-right soft glow */
+    radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 40%),
+    /* Modern structural grid */
+    linear-gradient(to right, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px);
+  
+  /* Lock the background in place so scrolling is buttery smooth */
+  background-size: 100% 100%, 100% 100%, 45px 45px, 45px 45px;
+  background-attachment: fixed;
 }
 
 .app-container { width: 100%; max-width: 950px; padding: 2rem 1rem; display: flex; flex-direction: column; gap: 3rem; }
