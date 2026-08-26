@@ -140,8 +140,15 @@ export default function App() {
     }
   };
 
-  const handleChange = (e) => {
+const handleChange = (e) => {
     if (status === 'finished') return;
+    
+    // NEW FIX: If the game is idle and the user types ANYTHING, start the timer!
+    // This bypasses the mobile keyboard bug completely.
+    if (status === 'idle' && e.target.value.length > 0) {
+      setStatus('running');
+    }
+
     const val = e.target.value.trim();
     if (val.length <= words[activeWordIndex].length + 15) setCurrentInput(val);
   };
