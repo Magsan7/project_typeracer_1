@@ -212,7 +212,7 @@ export default function App() {
   return (
     <div className="app-container">
       <header>
-        <div className="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>TypeForge</div>
+        <div className="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>VectraType</div>
         <div className="theme-picker">{THEMES.map(t => (<div key={t.id} className={`swatch ${theme === t.id ? 'active' : ''}`} style={{ background: t.color }} onClick={() => setTheme(t.id)} title={t.id} />))}</div>
       </header>
       <main>
